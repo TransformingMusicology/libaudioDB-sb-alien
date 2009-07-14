@@ -51,6 +51,17 @@
   (datum (* adb-datum-t)))
 (define-int-checking-function %insert-datum (adb datum) %%insert-datum)
 
+(define-alien-routine ("audiodb_retrieve_datum" %%retrieve-datum) int
+  (adb (* adb-t))
+  (key c-string)
+  (datum (* adb-datum-t)))
+(define-int-checking-function %retrieve-datum (adb key datum) %%retrieve-datum)
+
+(define-alien-routine ("audiodb_free_datum" %%free-datum) int
+  (adb (* adb-t))
+  (datum (* adb-datum-t)))
+(define-int-checking-function %free-datum (adb datum) %%free-datum)
+
 (define-alien-type adb-status-t
   (struct adb-status
     (nfiles (unsigned 32))

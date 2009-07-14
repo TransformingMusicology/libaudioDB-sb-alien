@@ -99,6 +99,40 @@
             (setf (slot d 'power) nil))
         (sb-int:with-float-traps-masked (:invalid)
           (%insert-datum (slot-value db 'alien) (addr d)))))))
+
+(defgeneric retrieve (key db))
+
+(defmethod retrieve ((key string) (db adb))
+  ;; KLUDGE: this does multiple copies of the floating point data:
+  ;; once within audiodb_retrieve_datum(), and once from the alien to
+  ;; the lisp arrays.  Oh well.
+  (with-alien ((d adb-datum-t))
+    (setf (slot d 'times) nil
+          (slot d 'power) nil)
+    (%retrieve-datum (slot-value db 'alien) key (addr d))
+    (let* ((dim (slot d 'dim))
+           (nvectors (slot d 'nvectors))
+           (data (make-array (list nvectors dim) :element-type 'double-float))
+           (vector (sb-ext:array-storage-vector data))
+           ;; FIXME: this shares KEY
+           (datum (%make-datum :key key :data data)))
+      (sb-kernel:system-area-ub64-copy (alien-sap (slot d 'data)) 0
+                                       (sb-sys:vector-sap vector) 0
+                                       (* dim nvectors))
+      (unless (null-alien (slot d 'times))
+        (let ((times (make-array nvectors :element-type 'double-float)))
+          (sb-kernel:system-area-ub64-copy (alien-sap (slot d 'times)) 0
+                                           (sb-sys:vector-sap times) 0
+                                           nvectors)
+          (setf (datum-times datum) times)))
+      (unless (null-alien (slot d 'power))
+        (let ((power (make-array nvectors :element-type 'double-float)))
+          (sb-kernel:system-area-ub64-copy (alien-sap (slot d 'power)) 0
+                                           (sb-sys:vector-sap power) 0
+                                           nvectors)
+          (setf (datum-power datum) power)))
+      (%free-datum (slot-value db 'alien) (addr d))
+      datum)))
 
 (defstruct result
   (key "" :type string)
