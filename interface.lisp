@@ -116,23 +116,31 @@
            (vector (sb-ext:array-storage-vector data))
            ;; FIXME: this shares KEY
            (datum (%make-datum :key key :data data)))
-      (sb-kernel:system-area-ub64-copy (alien-sap (slot d 'data)) 0
-                                       (sb-sys:vector-sap vector) 0
-                                       (* dim nvectors))
-      (unless (null-alien (slot d 'times))
-        (let ((times (make-array nvectors :element-type 'double-float)))
-          (sb-kernel:system-area-ub64-copy (alien-sap (slot d 'times)) 0
-                                           (sb-sys:vector-sap times) 0
-                                           nvectors)
-          (setf (datum-times datum) times)))
-      (unless (null-alien (slot d 'power))
-        (let ((power (make-array nvectors :element-type 'double-float)))
-          (sb-kernel:system-area-ub64-copy (alien-sap (slot d 'power)) 0
-                                           (sb-sys:vector-sap power) 0
-                                           nvectors)
-          (setf (datum-power datum) power)))
-      (%free-datum (slot-value db 'alien) (addr d))
-      datum)))
+      (flet ((system-area-dfloat-copy (from-sap from-offset to-sap to-offset ndfloats)
+               ;; FIXME: the horror
+               #+#.(cl:if (cl:= sb-vm:n-word-bits 64) '(:and) '(:or))
+               (sb-kernel:system-area-ub64-copy
+                from-sap from-offset to-sap to-offset ndfloats)
+               #-#.(cl:if (cl:= sb-vm:n-word-bits 64) '(:and) '(:or))
+               (sb-kernel:system-area-ub32-copy 
+                from-sap from-offset to-sap to-offset (* 2 ndfloats))))
+        (system-area-dfloat-copy (alien-sap (slot d 'data)) 0
+                                 (sb-sys:vector-sap vector) 0
+                                 (* dim nvectors))
+        (unless (null-alien (slot d 'times))
+          (let ((times (make-array (* 2 nvectors) :element-type 'double-float)))
+            (system-area-dfloat-copy (alien-sap (slot d 'times)) 0
+                                     (sb-sys:vector-sap times) 0
+                                     (* 2 nvectors))
+            (setf (datum-times datum) times)))
+        (unless (null-alien (slot d 'power))
+          (let ((power (make-array nvectors :element-type 'double-float)))
+            (system-area-dfloat-copy (alien-sap (slot d 'power)) 0
+                                     (sb-sys:vector-sap power) 0
+                                     nvectors)
+            (setf (datum-power datum) power)))
+        (%free-datum (slot-value db 'alien) (addr d))
+        datum))))
 
 (defstruct result
   (key "" :type string)
