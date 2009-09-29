@@ -30,6 +30,12 @@
      (= length ,(length body))
      (present ,@body)))
 
+(defmacro assert-erroneous (form)
+  `(handler-case ,form
+     (error ())
+     (:no-error (&rest values) 
+       (error "No error: returned ~S" values))))
+
 (declaim (optimize debug))
 
 (defun test-0003 ()
@@ -134,3 +140,16 @@
             ("testfeature10" 0 0 0) ("testfeature10" 2 0 1)))
         (with-asserted-query-results (query50 db :npoints 1)
           ("testfeature01" 0 0 1) ("testfeature10" 0 0 0))))))
+
+(defun test-0048 ()
+  (let ((datum1 (make-datum "testfeature01" '((0d0 0.5d0) (0.5d0 0d0))
+                            :times (coerce '(0d0 1d0 1d0 2d0) '(vector double-float))))
+        (datum2 (make-datum "testfeature10" '((0.5d0 0d0) (0d0 0.5d0) (0.5d0 0d0))
+                            :times (coerce '(0d0 2d0 2d0 3d0 3d0 4d0) '(vector double-float)))))
+    (with-adb (db "testdb.0048" :direction :output :if-exists :supersede)
+      (insert datum1 db)
+      (insert datum2 db)
+      (l2norm db)
+      (assert-erroneous (retrieve "testfeature" db))
+      (assert (equalp (retrieve "testfeature01" db) datum1))
+      (assert (equalp (retrieve "testfeature10" db) datum2)))))
