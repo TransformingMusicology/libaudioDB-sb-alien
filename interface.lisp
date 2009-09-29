@@ -95,7 +95,7 @@
             (setf (slot d 'times) (sb-sys:vector-sap (sb-ext:array-storage-vector (datum-times datum))))
             (setf (slot d 'times) nil))
         (if (datum-power datum)
-            (setf (slot d 'power) (sb-sys:vector-sap (sb-ext:array-storage-vector (datum-times datum))))
+            (setf (slot d 'power) (sb-sys:vector-sap (sb-ext:array-storage-vector (datum-power datum))))
             (setf (slot d 'power) nil))
         (sb-int:with-float-traps-masked (:invalid)
           (%insert-datum (slot-value db 'alien) (addr d)))))))
