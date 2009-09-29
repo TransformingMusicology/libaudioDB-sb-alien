@@ -4,13 +4,13 @@
   `(defun ,name ,arglist
      (let ((result (,llname ,@arglist)))
        (unless (eql 0 result)
-         (error "~S on ~{~S ~}failed." ',name (list ,@arglist))))))
+         (error "~@<~S on ~{~S ~}failed.~@:>" ',name (list ,@arglist))))))
 
 (defmacro define-pointer-checking-function (name arglist llname)
   `(defun ,name ,arglist
      (let ((result (,llname ,@arglist)))
        (when (null-alien result)
-         (error "~S on ~{~S ~}failed." ',name (list ,@arglist)))
+         (error "~@<~S on ~{~S ~}failed.~@:>" ',name (list ,@arglist)))
        result)))
 
 (define-alien-type adb-t
