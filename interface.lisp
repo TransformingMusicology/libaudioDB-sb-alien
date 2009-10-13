@@ -312,7 +312,8 @@
                (when (logbitp 1 (slot (slot qspec 'refine) 'flags))
                  (free-alien (slot (slot (slot qspec 'refine) 'exclude) 'keys)))
                (free-alien qspec)))))))
-  (def query string (setf (slot qdatum 'key) datum))
+  (def query string (setf (slot qdatum 'key) datum
+                          (slot qdatum 'data) nil))
   (def query datum 
     (setf (slot qdatum 'key) (datum-key datum))
     (setf (slot qdatum 'dim) (array-dimension (datum-data datum) 1))
