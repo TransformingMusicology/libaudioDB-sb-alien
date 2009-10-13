@@ -325,6 +325,16 @@
         (setf (slot qdatum 'power) (sb-sys:vector-sap (sb-ext:array-storage-vector (datum-times datum))))
         (setf (slot qdatum 'power) nil))))
 
+(defgeneric liszt (adb))
+(defmethod liszt ((db adb))
+  (let ((results (%liszt (slot-value db 'alien))))
+    (unwind-protect
+         (loop for i below (slot results 'nresults)
+               with entries = (slot results 'entries)
+               for entry = (deref entries i)
+               collect (cons (slot entry 'key) (slot entry 'nvectors)))
+      (%free-liszt-results (slot-value db 'alien) results))))
+      
 #+test
 (sb-adb:with-adb (db "/home/csr21/tmp/omras2-workshop/9.adb")
   (sb-adb:query "KSA_CHARM_337" db :exhaustivep t :sequence-length 30 

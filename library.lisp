@@ -137,5 +137,24 @@
 (define-int-checking-function %free-query-results (adb spec results)
   %%free-query-results)
 
+(define-alien-type adb-track-entry-t
+  (struct adbtrackentry
+    (nvectors (unsigned 32))
+    (key c-string)))
+
+(define-alien-type adb-liszt-results-t
+  (struct adblisztresults
+    (nresults (unsigned 32))
+    (entries (* adb-track-entry-t))))
+
+(define-alien-routine ("audiodb_liszt" %%liszt) (* adb-liszt-results-t)
+  (adb (* adb-t)))
+(define-pointer-checking-function %liszt (adb) %%liszt)
+(define-alien-routine ("audiodb_liszt_free_results" %%free-liszt-results) int
+  (adb (* adb-t))
+  (results (* adb-liszt-results-t)))
+(define-int-checking-function %free-liszt-results (adb results)
+  %%free-liszt-results)
+
 (define-alien-routine ("audiodb_close" %close) void
   (adb (* adb-t)))
