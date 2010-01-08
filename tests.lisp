@@ -1,5 +1,7 @@
 (in-package "SB-ADB")
 
+(load-shared-object "../../libaudioDB.so.0.0")
+
 (define-symbol-macro %default-query-args nil)
 (defmacro with-default-query-args (args &body body &environment env)
   (let ((current-args (macroexpand '%default-query-args env)))
@@ -153,3 +155,11 @@
       (assert-erroneous (retrieve "testfeature" db))
       (assert (equalp (retrieve "testfeature01" db) datum1))
       (assert (equalp (retrieve "testfeature10" db) datum2)))))
+
+(defun run-tests ()
+  (test-0003)
+  (test-0004)
+  (test-0010)
+  (test-0031)
+  (test-0036)
+  (test-0048))
