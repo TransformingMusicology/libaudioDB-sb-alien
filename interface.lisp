@@ -215,7 +215,9 @@
 
                           (radius nil radiusp)
                           (include-keys nil include-keys-p)
-                          (exclude-keys nil exclude-keys-p))
+                          (exclude-keys nil exclude-keys-p)
+                          (query-hop 1 query-hop-p)
+                          (db-hop 1 db-hop-p))
           (unless (slot-boundp db 'alien)
             (error "database ~S is closed" db))
          (with-alien ((qid adb-query-id-t)
@@ -268,8 +270,11 @@
                    (loop for key being the elements of exclude-keys
                          for i upfrom 0
                          do (setf (deref keys i) key)))))
+             (when (or query-hop-p db-hop-p)
+               (setf refine-flags (logior refine-flags 64))
+               (setf (slot qrefine 'qhopsize) query-hop
+                     (slot qrefine 'ihopsize) db-hop))
              (setf (slot qrefine 'flags) refine-flags))
-           (setf (slot qrefine 'hopsize) 1)
            
            ;; FIXME: hm, this possibly suggests that there's something
            ;; a bit wrong with the C audioDB interface.  The API

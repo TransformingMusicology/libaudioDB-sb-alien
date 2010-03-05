@@ -105,7 +105,8 @@
     (absolute-threshold double)
     (relative-threshold double)
     (duration-ratio double)
-    (hopsize (unsigned 32))))
+    (qhopsize (unsigned 32))
+    (ihopsize (unsigned 32))))
 
 (define-alien-type adb-query-spec-t
   (struct adb-query-spec
