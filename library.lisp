@@ -78,26 +78,26 @@
 (define-int-checking-function %status (adb datum) %%status)
 
 (define-alien-type adb-query-id-t
-  (struct adbqueryid
+  (struct adb-query-id
     (datum (* adb-datum-t))
     (sequence-length (unsigned 32))
     (flags (unsigned 32))
     (sequence-start (unsigned 32))))
 
 (define-alien-type adb-query-parameters-t
-  (struct adbqueryparameters
+  (struct adb-query-parameters
     (accumulation (unsigned 32))
     (distance (unsigned 32))
     (npoints (unsigned 32))
     (ntracks (unsigned 32))))
 
 (define-alien-type adb-keylist-t
-  (struct adbkeylist
+  (struct adb-key-list
     (nkeys (unsigned 32))
     (keys (* c-string))))
 
 (define-alien-type adb-query-refine-t
-  (struct adbqueryrefine
+  (struct adb-query-refine
     (flags (unsigned 32))
     (include adb-keylist-t)
     (exclude adb-keylist-t)
@@ -108,13 +108,13 @@
     (hopsize (unsigned 32))))
 
 (define-alien-type adb-query-spec-t
-  (struct adbqueryspec
+  (struct adb-query-spec
     (qid adb-query-id-t)
     (params adb-query-parameters-t)
     (refine adb-query-refine-t)))
 
 (define-alien-type adb-result-t
-  (struct adbresult
+  (struct adb-result
     (qkey c-string)
     (ikey c-string)
     (qpos (unsigned 32))
@@ -122,7 +122,7 @@
     (dist double)))
 
 (define-alien-type adb-query-results-t
-  (struct adbqueryresults
+  (struct adb-query-results
     (nresults (unsigned 32))
     (results (* adb-result-t))))
 
@@ -139,12 +139,12 @@
   %%free-query-results)
 
 (define-alien-type adb-track-entry-t
-  (struct adbtrackentry
+  (struct adb-track-entry
     (nvectors (unsigned 32))
     (key c-string)))
 
 (define-alien-type adb-liszt-results-t
-  (struct adblisztresults
+  (struct adb-liszt-results
     (nresults (unsigned 32))
     (entries (* adb-track-entry-t))))
 
