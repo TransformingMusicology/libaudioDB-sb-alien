@@ -115,10 +115,11 @@
 
 (define-alien-type adb-result-t
   (struct adbresult
-    (key c-string)
-    (dist double)
+    (qkey c-string)
+    (ikey c-string)
     (qpos (unsigned 32))
-    (ipos (unsigned 32))))
+    (ipos (unsigned 32))
+    (dist double)))
 
 (define-alien-type adb-query-results-t
   (struct adbqueryresults

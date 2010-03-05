@@ -143,7 +143,8 @@
         datum))))
 
 (defstruct result
-  (key "" :type string)
+  (qkey "" :type string)
+  (ikey "" :type string)
   (distance 0d0 :type double-float)
   (qpos 0 :type (and unsigned-byte fixnum))
   (ipos 0 :type (and unsigned-byte fixnum)))
@@ -163,7 +164,7 @@
       (sequence:dosequence (r o)
         (pprint-pop)
         (format s "~A ~6,3e ~D ~D~@:_"
-                (result-key r) (result-distance r)
+                (result-ikey r) (result-distance r)
                 (result-qpos r) (result-ipos r))))))
       
 (defmethod sequence:length ((o copied-query-results))
@@ -298,7 +299,8 @@
                                   (loop for i below nresults
                                         for r = (deref cresults i)
                                         collect (make-result 
-                                                 :key (slot r 'key) 
+                                                 :ikey (slot r 'ikey) 
+                                                 :qkey (slot r 'qkey) 
                                                  :distance (slot r 'dist)
                                                  :qpos (slot r 'qpos) 
                                                  :ipos (slot r 'ipos)))
