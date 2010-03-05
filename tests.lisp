@@ -17,7 +17,7 @@
        (flet ((%present (list)
                 (find-if (lambda (r)
                            (and
-                            (string= (first list) (result-key r))
+                            (string= (first list) (result-ikey r))
                             (< (abs (- (second list) (result-distance r))) 1e-4)
                             (= (third list) (result-qpos r))
                             (= (fourth list) (result-ipos r))))
