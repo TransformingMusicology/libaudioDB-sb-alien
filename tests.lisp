@@ -1,6 +1,6 @@
 (in-package "SB-ADB")
 
-(load-shared-object "../../libaudioDB.so.0.0")
+(load-shared-object #+darwin "libaudioDB.0.0.dylib" #+linux "libaudioDB.so.0.0")
 
 (define-symbol-macro %default-query-args nil)
 (defmacro with-default-query-args (args &body body &environment env)
